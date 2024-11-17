@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import Cart from './pages/Cart';
 import Explore from './pages/Explore';
@@ -6,6 +6,8 @@ import ProductDetails from './pages/ProductDetails';
 import AfterCheck from './pages/AfterCheck';
 import { FiShoppingCart } from 'react-icons/fi';
 import DynamicButton from './DynamicButton';
+import RecommendationsSection from './components/Recommendations';
+import { getRecommendations } from './services/recommendationService';
 
 
 
@@ -145,6 +147,41 @@ const ProductCard = React.memo(({ product, onClick, onAddToCart }) => {
 
 function App() {
   const [cart, setCart] = useState([]);
+  const [recommendations, setRecommendations] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [accountId, setAccountId] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogin = async () => {
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:3001/api/recommendations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ accountId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+
+      // Update recommendations state directly from the response
+      setRecommendations(data.recommendations);
+      setCurrentUser({
+        id: accountId,
+        data: data.metrics // Store metrics in user data
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const featuredProducts = [
     {
@@ -156,13 +193,13 @@ function App() {
     {
       id: 2,
       name: 'TV Bundle',
-      image: '/phoneservice.jpg',
+      image: '/tvpackage.webp',
       description: 'Premium channels and entertainment'
     },
     {
       id: 3,
       name: 'Phone Service',
-      image: '/tvpackage.webp',
+      image: '/phoneservice.jpg',
       description: 'Reliable home phone service'
     }
   ];
@@ -306,7 +343,7 @@ function App() {
     TV: 'TV Services',
     ADDONS: 'Add-on Services'
   };
-  
+
   const products = [
     {
       id: 1,
@@ -362,7 +399,7 @@ function App() {
         'Seamless WiFi mesh system',
         'Eliminates WiFi dead zones'
       ],
-      videoUrl: '/wifiextender.mov',
+      videoUrl: '/wifiextend.mov',
     },
     {
       id: 5,
@@ -457,7 +494,7 @@ function App() {
         'Advanced parental controls',
         'Anti-virus protection'
       ],
-      videoUrl: '/totalshield.mov',
+      videoUrl: '/shield.mov',
     },
     {
       id: 12,
@@ -471,7 +508,7 @@ function App() {
         'Software installation help',
         'Network optimization'
       ],
-      videoUrl: '/techpro.mov',
+      videoUrl: '/help.mov',
     },
     {
       id: 13,
@@ -485,11 +522,11 @@ function App() {
         'Real-time alerts',
         'Credit monitoring'
       ],
-      videoUrl: '/identity.mov',
+      videoUrl: '/incog.mov',
     },
     {
       id: 14,
-      name: 'YouTube TV',
+      name: 'Battery Backup',
       price: 79.99,
       category: productCategories.TV,
       features: [
@@ -498,7 +535,7 @@ function App() {
         '3 simultaneous streams',
         'Unlimited DVR storage'
       ],
-      videoUrl: '/ytv.mov',
+      videoUrl: '/battery.mov',
     }
   ];
 
@@ -508,8 +545,14 @@ function App() {
     setCart(prevCart => [...prevCart, product]);
   }, []);
 
-  function Navigation({ cart }) {
+  function Navigation({ cart, accountId, setAccountId }) {
     const navigate = useNavigate();
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      handleLogin();
+    };
+
     return (
       <nav style={{
         backgroundColor: '#E31837',
@@ -540,6 +583,47 @@ function App() {
             gap: '20px',
             alignItems: 'center'
           }}>
+            <form
+              onSubmit={handleSubmit}
+              style={{
+                display: 'flex',
+                gap: '10px',
+                alignItems: 'center'
+              }}
+            >
+              <input
+                type="text"
+                value={accountId}
+                onChange={(e) => setAccountId(e.target.value)}
+                placeholder="Enter Account ID"
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  border: 'none',
+                  width: '200px',
+                  fontSize: '1rem'
+                }}
+              />
+              <button
+                type="submit"
+                disabled={isLoading}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: 'white',
+                  color: '#E31837',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  transition: 'all 0.2s ease',
+                  opacity: isLoading ? 0.7 : 1
+                }}
+              >
+                {isLoading ? 'Loading...' : 'Login'}
+              </button>
+            </form>
+
             <div
               onClick={() => navigate('/cart')}
               style={{
@@ -579,16 +663,9 @@ function App() {
       </nav>
     );
   }
-
-  function HomePage({ products, addToCart, featuredProducts }) {
+  function HomePage({ products, addToCart, featuredProducts, accountId, recommendations }) {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
-
-    const displayedProducts = searchTerm
-      ? products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-      : products;
 
     return (
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
@@ -601,7 +678,7 @@ function App() {
             type="text"
             placeholder="Search products..."
             value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm(e.target.value)}
             style={{
               padding: '12px',
               width: '400px',
@@ -612,6 +689,14 @@ function App() {
           />
         </div>
 
+        {currentUser && recommendations && (
+          <RecommendationsSection
+            recommendations={recommendations}
+            products={products}
+            onAddToCart={addToCart}
+          />
+        )}
+
         <Carousel featuredProducts={featuredProducts} />
 
         <div style={{
@@ -620,7 +705,6 @@ function App() {
           gap: '20px',
           marginBottom: '40px'
         }}>
-
           <DynamicButton
             variant="primary"
             onClick={() => navigate('/explore')}
@@ -635,7 +719,9 @@ function App() {
           gap: '30px',
           marginBottom: '40px'
         }}>
-          {displayedProducts.map(product => (
+          {products.filter((product) =>
+            product.name.toLowerCase().includes(searchTerm.toLowerCase())
+          ).map((product) => (
             <ProductCard
               key={product.id}
               product={product}
@@ -651,13 +737,19 @@ function App() {
   return (
     <Router>
       <div style={{ backgroundColor: '#f5f5f5' }}>
-        <Navigation cart={cart} />
+        <Navigation
+          cart={cart}
+          accountId={accountId}
+          setAccountId={setAccountId}
+        />
         <Routes>
           <Route path="/" element={
             <HomePage
               products={products}
               featuredProducts={featuredProducts}
               addToCart={addToCart}
+              accountId={accountId}
+              recommendations={recommendations}
             />
           } />
           <Route path="/cart" element={<Cart cart={cart} setCart={setCart} />} />
