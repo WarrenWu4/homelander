@@ -1,13 +1,13 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-
+import path
 
 def load_page():
     st.map(df, latitude="latitude", longitude="longitude", size=st.session_state["column"], color=(200, 0, 0, 0.5))
 
 def load_data():
-    new_df = pd.read_csv("data/preprocessed_customers.csv")
+    new_df = pd.read_csv("https://raw.githubusercontent.com/WarrenWu4/homelander/master/dashboard/data/preprocessed_customers.csv")
     return new_df
 
 st.set_page_config(page_title="X-Ray - Homelander", layout="wide")

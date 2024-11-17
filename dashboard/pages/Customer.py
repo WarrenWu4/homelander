@@ -9,7 +9,7 @@ st.write("""
 
 @st.cache_data
 def load_data():
-    df = pd.read_csv("data/example_networks.csv")
+    df = pd.read_csv("https://raw.githubusercontent.com/WarrenWu4/homelander/master/dashboard/data/example_networks.csv")
     return df
 
 # filter by customer id
