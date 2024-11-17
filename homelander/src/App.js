@@ -156,7 +156,7 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://homelander-strength.vercel.app/recommendations', {
+      const response = await fetch('https://homelander-strength.vercel.app/api/recommendations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
