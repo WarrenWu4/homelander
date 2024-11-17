@@ -156,7 +156,7 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://strength.thehomelander.tech/api/recommendations', {
+      const response = await fetch('http://strength.thehomelander.tech/recommendations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
