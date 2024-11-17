@@ -7,7 +7,7 @@ const path = require('path');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({origins: '*'}));
 app.use(express.json());
 
 // Function to get user data from CSV
