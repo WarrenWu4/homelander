@@ -14,7 +14,7 @@ app.use(express.json());
 const findUserInCSV = (accountId) => {
   return new Promise((resolve, reject) => {
     const results = [];
-    fs.createReadStream(path.join(__dirname, 'data', 'current_customers.csv'))
+    fs.createReadStream(path.join(__dirname, 'data', 'example_networks.csv'))
       .pipe(csv.parse({ columns: true, trim: true }))
       .on('data', (row) => {
         if (row.acct_id === accountId) {

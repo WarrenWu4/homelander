@@ -5,7 +5,7 @@ const path = require('path');
 async function getUserData(accountId) {
   return new Promise((resolve, reject) => {
     const results = [];
-    const csvPath = path.join(__dirname, '..', 'data', 'current_customers.csv');
+    const csvPath = path.join(__dirname, '..', 'data', 'example_networks.csv');
 
     // Debug logs
     console.log('Looking for account ID:', accountId);
@@ -69,7 +69,7 @@ async function getUserData(accountId) {
 // Add a function to validate the CSV file structure
 async function validateCSV() {
   return new Promise((resolve, reject) => {
-    const csvPath = path.join(__dirname, '..', 'data', 'current_customers.csv');
+    const csvPath = path.join(__dirname, '..', 'data', 'example_networks.csv');
     let isFirstRow = true;
     let expectedColumns = [
       'acct_id', 'extenders', 'wireless_clients_count', 'wired_clients_count',
