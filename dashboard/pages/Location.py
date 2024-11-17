@@ -24,8 +24,3 @@ st.selectbox(
 
 df = load_data()
 load_page()
-    
-st.write("""**Insights**
-         
-Placeholder text         
-""")

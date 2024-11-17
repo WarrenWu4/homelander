@@ -29,8 +29,6 @@ else:
     }, columns=['Communication Type', 'Mbps', "site"])
     st.bar_chart(filtered_data, x="Communication Type", y="Mbps", color="site", stack=False)
     
-    st.write("**Insights**")
-
     # rssi metrics to look at overall signal strength
     st.write("### RSSI Metrics")
     filtered_data = pd.DataFrame({
@@ -39,8 +37,6 @@ else:
         "site": ['rssi_min','rssi_mean', 'rssi_median', 'rssi_max']
     })
     st.bar_chart(filtered_data, x="RSSI", y="dBm", color="site", stack=False)
-
-    st.write("**Insights**")
 
     # whether the user needs more or less extenders based on their connected clients
     st.write("### Extenders vs. Clients")
@@ -51,8 +47,6 @@ else:
     })
     st.bar_chart(filtered_data, x="Label", y="Count", color="site", stack=False)
 
-    st.write("**Insights**")
-
     # how close the user's network usage is to their max network speed 
     st.write("### Network Speed & Usage")
     filtered_data = pd.DataFrame({
@@ -60,7 +54,4 @@ else:
         "Mbps": [float(customer_data['network_speed'].values[0][:-1]), (customer_data['rx_max_bps'].values[0]/1_000_000), (customer_data['tx_max_bps'].values[0]/1_000_000)]
     })
     st.bar_chart(filtered_data, x="Label", y="Mbps", horizontal=True)
-
-    st.write("**Insights**")
-
 
