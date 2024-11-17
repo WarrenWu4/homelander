@@ -28,7 +28,7 @@ def get_recommendation_reason(product, user_info, num_connections):
 
 try:
     # Read and process customer data
-    with open("./data/example_network.csv", "r") as f:
+    with open("./data/example_networks.csv", "r") as f:
         names = f.readline().split(',')
         values = f.read().split('\n')[:-1]
         locations = list(set([",".join(i.split(',')[15:17]) for i in values]))
